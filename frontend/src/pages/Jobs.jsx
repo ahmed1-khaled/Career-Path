@@ -2,14 +2,14 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import useAsync from "../hooks/useAsync";
 import usePageTitle from "../hooks/usePageTitle";
-import { getJobs, getSavedJobs } from "../api/jobs";
+import { getJobs } from "../api/jobs";
 import { getProfile } from "../api/profile";
 import JobCard from "../components/JobCard";
 import { Loading, ErrorBox, Empty } from "../components/Status";
 
 export default function Jobs() {
   usePageTitle("Jobs");
-  const { data, loading, error, reload } = useAsync(() => Promise.all([getProfile(), getJobs(), getSavedJobs()]));
+  const { data, loading, error, reload } = useAsync(() => Promise.all([getProfile(), getJobs()]));
   const [search, setSearch] = useState("");
   const [workType, setWorkType] = useState("All");
   const [sort, setSort] = useState("match");
@@ -17,36 +17,33 @@ export default function Jobs() {
   if (loading) return <Loading text="Finding the best jobs for you..." />;
   if (error) return <ErrorBox message={error} onRetry={reload} />;
 
-  const [profile, rawJobs, savedJobs] = data;  const savedIds = new Set(savedJobs.map((job) => String(job.id))); const jobs = rawJobs.map((job) => ({ ...job, is_saved: savedIds.has(String(job.id)) }));
+  const [profile, jobs] = data;
 
-  // لسه مفيش بيانات نرشّح منها
   if (jobs.length === 0) {
     return profile.skills.length === 0 ? (
       <Empty title="Upload your CV to see matches" text="We match jobs using your skills. Upload your CV, or add your skills by hand.">
-        <Link className="btn" to="/upload">
-          Upload CV
-        </Link>
-        <Link className="btn btn-secondary" to="/skills">
-          
-        </Link>
+        <Link className="btn" to="/upload">Upload CV</Link>
+        <Link className="btn btn-secondary" to="/skills">Add skills</Link>
       </Empty>
     ) : (
-      <Empty title="No matching jobs yet" text="None of the current jobs ask for the skills on your profile. Try adding more skills.">
-        <Link className="btn" to="/skills">
-          Edit skills
-        </Link>
+      <Empty title="No matching jobs yet" text="There are no matching roles in the current job catalog. Try adding more skills or update your preferences.">
+        <Link className="btn" to="/skills">Edit skills</Link>
+        <Link className="btn btn-secondary" to="/onboarding">Update preferences</Link>
       </Empty>
     );
   }
 
   const q = search.trim().toLowerCase();
   const list = jobs
-    .filter(
-      (j) =>
-        (workType === "All" || j.work_type === workType) &&
-        (j.title.toLowerCase().includes(q) || j.company.toLowerCase().includes(q))
+    .filter((job) =>
+      (workType === "All" || job.work_type === workType) &&
+      (String(job.title || "").toLowerCase().includes(q) ||
+       String(job.company || "").toLowerCase().includes(q))
     )
-    .sort((a, b) => (sort === "match" ? b.match_score - a.match_score : a.title.localeCompare(b.title)));
+    .sort((a, b) => {
+      if (sort === "title") return String(a.title || "").localeCompare(String(b.title || ""));
+      return (b.match_score ?? -1) - (a.match_score ?? -1);
+    });
 
   const clear = () => {
     setSearch("");
@@ -57,7 +54,7 @@ export default function Jobs() {
     <>
       <div className="page-header">
         <h1>Recommended jobs</h1>
-        <p className="muted">Ranked by how many of the required skills you have.</p>
+        <p className="muted">Ranked by the profile-fit score, using available skills and role signals.</p>
       </div>
 
       <div className="filters">
