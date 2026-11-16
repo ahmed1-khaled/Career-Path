@@ -36,6 +36,12 @@ Vite normally opens `http://localhost:5173`. The supplied backend allows the def
 
 The backend does not expose a standalone `GET /api/jobs/{id}`; job details are resolved from the matches or saved-jobs lists.
 
+## CV data and AI privacy
+
+Resume files and extracted text are stored by the backend. The default local setup stores files under `backend/data/resumes/` and profile data in SQLite. The CV is used for profile creation and job-fit analysis.
+
+When Ollama is configured as a local provider, AI processing can remain on the configured machine. If an external OpenAI-compatible provider is configured, professional profile and resume context may be sent to that provider for analysis. Review the provider's privacy and retention terms before enabling it. Never commit local resume files, database files, or real environment credentials.
+
 ## Build
 
 ```bash
