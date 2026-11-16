@@ -40,6 +40,10 @@ The current suggestions endpoint is heuristic, not a full OCR or general-purpose
 
 The backend does not expose a standalone `GET /jobs/{id}`; the frontend resolves job details from the current matches or saved jobs, then calls the analysis endpoint.
 
+## CV and AI privacy
+
+Resume files are stored by the backend and extracted text is included in the authenticated candidate profile. The role-analysis service may use the configured AI provider. A local Ollama service can keep processing on the configured machine; an external OpenAI-compatible provider may receive professional profile and resume context. Review provider terms and retention settings before enabling an external provider.
+
 ## Other backend features
 
 The backend also provides application tracking, application queue preparation, source management/discovery, analytics, and Excel export endpoints. Those routes are available for future frontend screens.
