@@ -211,7 +211,7 @@ export default function CVUpload() {
       {status === "idle" && error && <Alert type="error">{error}</Alert>}
 
       <p className="muted small">
-        Your CV is used only to build your profile. You can delete it and the data extracted from it at any time, here or
+        Your CV builds your profile and is used for job-fit analysis. External AI providers may receive professional CV context when configured; review the privacy note before enabling one. You can delete the file and extracted text here or
         in <Link to="/settings">Settings</Link>.
       </p>
     </div>
