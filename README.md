@@ -28,6 +28,14 @@ The repository contains an integration snapshot, not a claim that every planned 
 - Job-source coverage depends on provider availability, configuration, indexing, and applicable site terms.
 - The development servers should not be exposed directly to the public internet.
 
+## Privacy and safe use
+
+- Resume files and extracted text are stored by the backend. With the default local setup, files are kept under `backend/data/resumes/` and structured profile data is kept in the local SQLite database.
+- The CV and saved profile are used to build the candidate profile and compare it with job requirements.
+- With a local Ollama provider, AI processing can remain on the configured local machine. If an external OpenAI-compatible provider is configured, professional profile and resume context may be sent to that provider for analysis. Review its privacy and retention terms before enabling it.
+- Never commit real `.env` files, API keys, resumes, local databases, browser profiles, or private exports.
+- The development server is for local use. Do not expose it directly to the public internet or treat this snapshot as a production multi-user deployment.
+
 ## Technology
 
 | Layer | Technologies |
