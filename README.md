@@ -10,7 +10,8 @@ The current web interface is branded **StepUp** in several frontend screens. The
 
 - **CV upload and extraction:** accepts PDF, DOC, DOCX, and RTF files up to 2 MB. The backend extracts selectable text where supported.
 - **Profile review:** review and edit personal details, summary, skills, education, experience, certifications, and projects.
-- **Job matching:** retrieve recommended jobs and match explanations from the backend using the candidate profile.
+- **Job matching:** retrieve recommended jobs, match explanations, and a detailed role-fit analysis with evidenced and missing skills, experience/location checks, and screening questions.
+- **Saved jobs:** bookmark and retrieve jobs separately for each authenticated account.
 - **Authentication:** email/password registration and login with server-managed sessions, HttpOnly session cookies, and CSRF protection.
 - **Job discovery backend:** supports configured job feeds and company boards, with optional provider integrations.
 - **Optional AI services:** Ollama/local model support and optional OpenAI-compatible providers for AI-assisted workflows.
@@ -20,7 +21,8 @@ The current web interface is branded **StepUp** in several frontend screens. The
 The repository contains an integration snapshot, not a claim that every planned feature is complete or production deployed.
 
 - Google or Cognito sign-in is not implemented by the supplied backend.
-- Saved-job persistence is not currently exposed as a complete frontend/backend workflow.
+- Saved jobs are supported per account. Detailed per-job skill-gap analysis runs when a job's details are opened.
+- Legacy `.doc` resumes can be stored but are not parsed; use `.docx` or a text-based PDF for automatic text extraction.
 - The default backend database is SQLite for local development.
 - No Huawei Cloud deployment or cloud-hosted production environment is claimed as completed.
 - Job-source coverage depends on provider availability, configuration, indexing, and applicable site terms.
