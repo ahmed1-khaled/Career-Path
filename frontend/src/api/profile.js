@@ -85,31 +85,43 @@ export async function savePreferences(preferences) {
   return mapProfile(updated).preferences;
 }
 export async function getCvAnalysis() {
+  const profile = await rawProfile();
+  if (!profile.resume_original_filename) return null;
+
+  let suggestions = {};
+  let extractionMessage = "";
   try {
-    const suggestions = await api("/profile/resume/suggestions", { method: "POST" });
-    const profile = await rawProfile();
-    const personal = parseJson(profile.personal_details_json, {});
-    return {
-      personal: {
-        full_name: profile.full_name || personal.full_name || "",
-        email: personal.email || "",
-        phone: personal.phone || "",
-        location: personal.location || profile.preferred_locations || "",
-        linkedin_url: personal.linkedin_url || "",
-        portfolio_url: personal.portfolio_url || "",
-      },
-      summary: profile.profile_summary || suggestions.profile_summary || "",
-      skills: split(profile.skills || suggestions.skills),
-      education: parseJson(profile.education_json, []),
-      experience: parseJson(profile.employment_history_json, []),
-      certifications: parseJson(profile.certifications_json, []),
-      projects: parseJson(profile.projects_json, []),
-      headline: profile.resume_headline || suggestions.headline || "",
-    };
+    suggestions = await api("/profile/resume/suggestions", { method: "POST" });
   } catch (error) {
-    if (error.status === 400) return null;
-    throw error;
+    if (error.status !== 400) throw error;
+    if (profile.resume_parse_status === "uploaded_extraction_not_supported_for_legacy_doc") {
+      extractionMessage = "This legacy .doc file is stored, but text extraction is not supported for this format. Save it as .docx or a text-based PDF, upload it again, or complete the fields below manually.";
+    } else if (profile.resume_parse_status === "uploaded_no_selectable_text") {
+      extractionMessage = "The file is stored, but no selectable text was found. It may be a scanned image-based PDF. Upload a text-based PDF or DOCX, or complete the fields below manually.";
+    } else {
+      extractionMessage = error.message || "No text could be extracted from this CV. You can still complete the profile fields manually.";
+    }
   }
+
+  const personal = parseJson(profile.personal_details_json, {});
+  return {
+    personal: {
+      full_name: profile.full_name || personal.full_name || "",
+      email: personal.email || "",
+      phone: personal.phone || "",
+      location: personal.location || profile.preferred_locations || "",
+      linkedin_url: personal.linkedin_url || "",
+      portfolio_url: personal.portfolio_url || "",
+    },
+    summary: profile.profile_summary || suggestions.profile_summary || "",
+    skills: split(profile.skills || suggestions.skills),
+    education: parseJson(profile.education_json, []),
+    experience: parseJson(profile.employment_history_json, []),
+    certifications: parseJson(profile.certifications_json, []),
+    projects: parseJson(profile.projects_json, []),
+    headline: profile.resume_headline || suggestions.headline || "",
+    extractionMessage,
+  };
 }
 export async function saveCvAnalysis(analysis) {
   const current = await rawProfile();
