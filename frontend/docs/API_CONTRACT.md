@@ -27,7 +27,7 @@ The registration schema accepts email and password. The frontend creates the acc
 - `DELETE /profile/resume` — removes the current resume file and extracted text.
 - `POST /profile/resume/suggestions` — returns heuristic suggestions from extracted text. Suggestions are not saved automatically.
 
-The current suggestions endpoint is heuristic, not a full OCR or general-purpose CV parser. Scanned PDFs or files without selectable text may not produce suggestions. Review and edit extracted or manually entered profile details before saving.
+The current suggestions endpoint is heuristic, not a full OCR or general-purpose CV parser. Scanned PDFs or files without selectable text may not produce suggestions. Legacy binary .doc files are stored but are not parsed; use .docx or a text-based PDF for automatic extraction. Review and edit extracted or manually entered profile details before saving.
 
 ## Jobs and matching
 
