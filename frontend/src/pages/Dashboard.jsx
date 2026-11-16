@@ -15,7 +15,7 @@ const greeting = () => {
 // المهارات الناقصة الأكتر تكرارًا في الوظايف (عشان نعرف نتعلم إيه الأول)
 function topMissing(jobs) {
   const counts = {};
-  jobs.forEach((j) => j.missing_skills.forEach((s) => (counts[s] = (counts[s] || 0) + 1)));
+  jobs.filter((j) => j.skill_gap_analyzed).forEach((j) => j.missing_skills.forEach((s) => (counts[s] = (counts[s] || 0) + 1)));
   return Object.entries(counts)
     .sort((a, b) => b[1] - a[1])
     .slice(0, 5);
@@ -30,7 +30,7 @@ export default function Dashboard() {
 
   const [profile, jobs] = data;
   const gaps = topMissing(jobs);
-  const allMissing = new Set(jobs.flatMap((j) => j.missing_skills)); // من غير تكرار
+  const allMissing = new Set(jobs.filter((j) => j.skill_gap_analyzed).flatMap((j) => j.missing_skills)); // unique skill gaps from completed analyses
   const steps = [
     { done: profile.onboarded, label: "Set your job preferences", to: "/onboarding", cta: "Set preferences" },
     { done: profile.has_cv, label: "Upload your CV", to: "/upload", cta: "Upload CV" },
@@ -84,7 +84,7 @@ export default function Dashboard() {
         </div>
         <div className="card stat">
           <span className="stat-number">{allMissing.size}</span>
-          <span className="muted">Skills to develop</span>
+          <span className="muted">Identified skill gaps</span>
         </div>
       </section>
 
@@ -100,7 +100,7 @@ export default function Dashboard() {
         <section className="card" aria-labelledby="gaps-title">
           <h2 id="gaps-title">Skills to develop</h2>
           {gaps.length === 0 ? (
-            <p className="muted">Nothing to show yet. Once you have matches, the skills you're missing most often appear here.</p>
+            <p className="muted">Open a recommended job and run its role-fit analysis to see evidence-based skill gaps here.</p>
           ) : (
             <>
               <ul className="gap-list">
