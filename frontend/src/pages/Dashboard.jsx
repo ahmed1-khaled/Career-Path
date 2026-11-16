@@ -12,15 +12,6 @@ const greeting = () => {
   return h < 12 ? "Good morning" : h < 18 ? "Good afternoon" : "Good evening";
 };
 
-// المهارات الناقصة الأكتر تكرارًا في الوظايف (عشان نعرف نتعلم إيه الأول)
-function topMissing(jobs) {
-  const counts = {};
-  jobs.filter((j) => j.skill_gap_analyzed).forEach((j) => j.missing_skills.forEach((s) => (counts[s] = (counts[s] || 0) + 1)));
-  return Object.entries(counts)
-    .sort((a, b) => b[1] - a[1])
-    .slice(0, 5);
-}
-
 export default function Dashboard() {
   usePageTitle("Dashboard");
   const { data, loading, error, reload } = useAsync(() => Promise.all([getProfile(), getJobs()]));
@@ -29,8 +20,6 @@ export default function Dashboard() {
   if (error) return <ErrorBox message={error} onRetry={reload} />;
 
   const [profile, jobs] = data;
-  const gaps = topMissing(jobs);
-  const allMissing = new Set(jobs.filter((j) => j.skill_gap_analyzed).flatMap((j) => j.missing_skills)); // unique skill gaps from completed analyses
   const steps = [
     { done: profile.onboarded, label: "Set your job preferences", to: "/onboarding", cta: "Set preferences" },
     { done: profile.has_cv, label: "Upload your CV", to: "/upload", cta: "Upload CV" },
@@ -82,10 +71,6 @@ export default function Dashboard() {
           <span className="stat-number">{jobs.length}</span>
           <span className="muted">Matching jobs</span>
         </div>
-        <div className="card stat">
-          <span className="stat-number">{allMissing.size}</span>
-          <span className="muted">Identified skill gaps</span>
-        </div>
       </section>
 
       <div className="two-col">
@@ -98,23 +83,16 @@ export default function Dashboard() {
         </section>
 
         <section className="card" aria-labelledby="gaps-title">
-          <h2 id="gaps-title">Skills to develop</h2>
-          {gaps.length === 0 ? (
-            <p className="muted">Open a recommended job and run its role-fit analysis to see evidence-based skill gaps here.</p>
-          ) : (
-            <>
-              <ul className="gap-list">
-                {gaps.map(([skill, count]) => (
-                  <li key={skill}>
-                    <strong>{skill}</strong>
-                    <span className="muted">
-                      asked for in {count} {count === 1 ? "job" : "jobs"}
-                    </span>
-                  </li>
-                ))}
-              </ul>
-              <p className="muted small">Open a job to find videos and courses for each missing skill.</p>
-            </>
+          <h2 id="gaps-title">Understand your skill gaps</h2>
+          <p className="muted">
+            Open a recommended job to compare its requirements with your saved CV and skills.
+            The job analysis shows which skills are evidenced in your profile, which were not found,
+            and what experience you may want to highlight.
+          </p>
+          {jobs.length > 0 && (
+            <Link className="btn btn-secondary" to={"/jobs/" + jobs[0].id}>
+              Analyze a recommended job
+            </Link>
           )}
         </section>
       </div>
