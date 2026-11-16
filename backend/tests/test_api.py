@@ -1,5 +1,5 @@
 from fastapi.testclient import TestClient
-from app.main import app
+from app.main import app, APP_VERSION
 
 
 def test_health():
@@ -7,7 +7,7 @@ def test_health():
         response = client.get("/api/health")
         assert response.status_code == 200
         assert response.json()["status"] == "ok"
-        assert response.json()["version"] == "0.6.3"
+        assert response.json()["version"] == APP_VERSION
 
 
 def test_profile_read_and_update():
@@ -254,7 +254,7 @@ def test_version_and_system_readiness_do_not_expose_secrets():
     with TestClient(app) as client:
         version = client.get("/api/version")
         assert version.status_code == 200
-        assert version.json()["version"] == "0.6.3"
+        assert version.json()["version"] == APP_VERSION
 
         readiness = client.get("/api/system/readiness")
         assert readiness.status_code == 200
