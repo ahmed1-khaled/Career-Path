@@ -260,7 +260,7 @@ def test_version_and_system_readiness_do_not_expose_secrets():
         assert readiness.status_code == 200
         payload = readiness.json()
         assert payload["status"] in {"ok", "degraded"}
-        assert payload["version"] == "0.6.3"
+        assert payload["version"] == APP_VERSION
         serialized = __import__("json").dumps(payload).lower()
         assert "openai_api_key" not in serialized
         assert "brave_search_api_key" not in serialized
