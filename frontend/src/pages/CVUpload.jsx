@@ -18,6 +18,7 @@ export default function CVUpload() {
   const [error, setError] = useState("");
   const [dragging, setDragging] = useState(false);
   const [current, setCurrent] = useState(null); // الـ CV اللي مرفوع قبل كده (لو موجود)
+  const [parseStatus, setParseStatus] = useState("");
 
   const busy = ["checking", "uploading", "processing"].includes(status);
 
@@ -46,6 +47,7 @@ export default function CVUpload() {
     try {
       const res = await uploadResume(f, setProgress);
       setResumeId(res.id || "current");
+      setParseStatus(res.parse_status || "");
       setStatus("completed");
       getProfile().then((latest) => setCurrent(latest.resume || null)).catch(() => {});
     } catch (e) {
@@ -77,6 +79,7 @@ export default function CVUpload() {
     setStatus("idle");
     setFile(null);
     setResumeId(null);
+    setParseStatus("");
     setError("");
     setProgress(0);
   };
@@ -89,6 +92,7 @@ export default function CVUpload() {
     try {
       await deleteResume(id);
       setCurrent(null);
+      setParseStatus("");
       reset();
     } catch (e) {
       setError(`Couldn't delete the file: ${e.message}`);
@@ -158,7 +162,18 @@ export default function CVUpload() {
               <span className="spinner small" aria-hidden="true" /> The backend has accepted the upload and extracted available text.
             </p>
           )}
-          {status === "completed" && <Alert type="success">CV uploaded. Review the available profile suggestions next.</Alert>}
+          {status === "completed" && parseStatus === "text_extracted" && (
+            <Alert type="success">CV uploaded and selectable text was extracted. Review the profile suggestions and correct any mistakes before saving.</Alert>
+          )}
+          {status === "completed" && parseStatus === "uploaded_no_selectable_text" && (
+            <Alert type="warning">The CV file was saved, but no selectable text was found. This often happens with scanned PDFs. Upload a text-based PDF or DOCX for automatic suggestions, or complete your profile manually.</Alert>
+          )}
+          {status === "completed" && parseStatus === "uploaded_extraction_not_supported_for_legacy_doc" && (
+            <Alert type="warning">The legacy .doc file was saved, but this format cannot be parsed by the current backend. Save it as .docx or a text-based PDF and upload it again for CV suggestions.</Alert>
+          )}
+          {status === "completed" && !parseStatus && (
+            <Alert type="success">CV uploaded. Review your profile and complete any missing details.</Alert>
+          )}
           {(status === "failed" || (status === "completed" && error)) && <Alert type="error">{error}</Alert>}
 
           <div className="actions">
