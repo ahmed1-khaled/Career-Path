@@ -151,12 +151,16 @@ export default function CVReview() {
       <div className="page-header">
         <h1>Review your profile</h1>
         <p className="muted">
-          This is what we found in your CV. Fix anything that's wrong; your job matches use your skills.
+          Review the information we could extract, correct anything that is wrong, and complete any missing details. Your job matches use your saved profile.
         </p>
         {USE_MOCK && (
           <Alert type="info">Demo mode: the details below are sample data, not read from the file you uploaded.</Alert>
         )}
       </div>
+
+      {form.extractionMessage && (
+        <Alert type="warning">{form.extractionMessage} You can still complete and save the profile fields manually.</Alert>
+      )}
 
       <section className="card">
         <h2>Personal information</h2>
