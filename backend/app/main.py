@@ -248,7 +248,7 @@ async def lifespan(app: FastAPI):
     yield
 
 
-APP_VERSION = "0.6.3"
+APP_VERSION = "4.73.0"
 app = FastAPI(title=settings.app_name, version=APP_VERSION, lifespan=lifespan)
 app.add_middleware(
     CORSMiddleware,

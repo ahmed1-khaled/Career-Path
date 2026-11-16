@@ -7,7 +7,7 @@ ENV_PATH = BACKEND_DIR / ".env"
 
 
 class Settings(BaseSettings):
-    app_name: str = "AI Job Hunter API"
+    app_name: str = "Career Path API"
     app_env: str = "development"
     database_url: str = f"sqlite:///{DEFAULT_DB_PATH.as_posix()}"
     cors_origins: str = "http://localhost:5173,http://127.0.0.1:5173,http://localhost:5174,http://127.0.0.1:5174"

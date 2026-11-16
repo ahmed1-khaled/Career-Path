@@ -28,6 +28,20 @@ run_multi_user_migrations(engine)
 
 
 @pytest.fixture(autouse=True)
+def reset_auth_rate_limiter():
+    """Isolate IP-based auth rate limits between tests."""
+    from app.errors import auth_rate_limiter
+
+    # Keep multiple attempts in one test intact, but avoid sharing the same
+    # TestClient IP quota with unrelated tests.
+    auth_rate_limiter._records.clear()
+    yield
+    auth_rate_limiter._records.clear()
+
+
+
+
+@pytest.fixture(autouse=True)
 def disable_live_job_source_calls(monkeypatch):
     from app import main
 

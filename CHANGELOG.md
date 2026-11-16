@@ -1,5 +1,13 @@
 # Changelog
 
+## v4.73.0 — Career Path integration snapshot
+
+- Publishes the current FastAPI backend and React/Vite frontend together at the repository root.
+- Aligns backend, frontend package, and repository version metadata to v4.73.0.
+- Isolates IP-based authentication rate-limit state between automated tests.
+- Documents the current CV upload, profile review, job-matching workflows, and known integration limits.
+- Does not claim Google/Cognito authentication or Huawei Cloud deployment as completed.
+
 ## v0.6.3 — release-candidate validation and packaging
 
 - Adds a pre-release validator for required files, version consistency, Markdown links, and local/private data.
