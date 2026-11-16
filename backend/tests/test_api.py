@@ -266,3 +266,38 @@ def test_version_and_system_readiness_do_not_expose_secrets():
         assert "brave_search_api_key" not in serialized
         assert "adzuna_app_key" not in serialized
         assert all({"name", "status", "message"}.issubset(item) for item in payload["checks"])
+
+
+def test_saved_job_bookmark_crud_is_idempotent():
+    from uuid import uuid4
+
+    suffix = uuid4().hex
+    with TestClient(app) as client:
+        created = client.post("/api/jobs", json={
+            "title": "Saved Job Test",
+            "company": "Career Path Test",
+            "location": "Remote",
+            "work_mode": "Remote",
+            "source_url": f"https://example.com/saved-jobs/{suffix}",
+            "description": "Python, SQL, and profile analysis.",
+            "verified_posting_time": False,
+        })
+        assert created.status_code == 201, created.text
+        job_id = created.json()["id"]
+
+        first_save = client.post("/api/jobs/saved", json={"job_id": job_id})
+        assert first_save.status_code == 201, first_save.text
+
+        second_save = client.post("/api/jobs/saved", json={"job_id": job_id})
+        assert second_save.status_code == 201, second_save.text
+
+        saved = client.get("/api/jobs/saved")
+        assert saved.status_code == 200, saved.text
+        assert [item["id"] for item in saved.json()].count(job_id) == 1
+
+        deleted = client.delete(f"/api/jobs/saved/{job_id}")
+        assert deleted.status_code == 200, deleted.text
+        assert client.get("/api/jobs/saved").json() == []
+
+        deleted_again = client.delete(f"/api/jobs/saved/{job_id}")
+        assert deleted_again.status_code == 404
